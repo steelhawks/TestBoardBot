@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.CANTalon;
@@ -43,6 +44,7 @@ public class Robot extends SampleRobot {
     final String defaultAuto = "Default";
     final String customAuto = "My Auto";
     SendableChooser chooser;
+    NetworkTable table;
 
     public Robot() {
     	camsrv = CameraServer.getInstance();
@@ -56,6 +58,7 @@ public class Robot extends SampleRobot {
         ct5 = new CANTalon(5);
         ct6 = new CANTalon(6);
         ct7 = new CANTalon(7);
+        table = NetworkTable.getTable("GRIP/myContoursReport");
     }
     
     public void robotInit() {
@@ -87,7 +90,16 @@ public class Robot extends SampleRobot {
      * Runs the motors with arcade steering.
      */
     public void operatorControl() {
-        while (isOperatorControl() && isEnabled()) {
+    	double[] defaultVal = new double[0];
+    	while (isOperatorControl() && isEnabled()) {
+        	
+        	double[] areas = table.getNumberArray("area", defaultVal);
+        	for (double area:areas){
+        		SmartDashboard.putNumber("area", area);
+        	}
+        	}
+        	System.out.println();
+        	
         	ct1.set(stick1.getY());
         	ct2.set(stick1.getX());
         	ct3.set(stick2.getY());
@@ -97,7 +109,6 @@ public class Robot extends SampleRobot {
         	ct7.set(gamepad.getRightX());
         }
         
-    }
 
     /**
      * Runs during test mode
